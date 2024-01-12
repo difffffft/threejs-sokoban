@@ -1,6 +1,9 @@
 import * as THREE from "three"
 
 // 地图大小
+export const BASE = import.meta.env.VITE_APP_BASE
+
+// 地图大小
 export const MAP_SIZE = 160
 
 // 模型长宽

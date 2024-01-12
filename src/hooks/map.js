@@ -2,6 +2,7 @@ import { MyBoxObj, MyEmptyObj, MyHeroObj, MyStoneObj, MyTreeObj, MyObjType } fro
 import { loadGLTFModel } from "@/utils"
 
 import { levelList } from "@/level"
+import { BASE } from "@/constans"
 
 export const isWin = (level, map) => {
     console.log(level);
@@ -47,10 +48,10 @@ export const createMap = async (level = 0, size = 16) => {
 
     let hero = null
 
-    const { scene: treeModel } = await loadGLTFModel("/gltf/tree.glb")
-    const { scene: stoneModel } = await loadGLTFModel("/gltf/stone.glb", 400)
-    const { scene: boxModel } = await loadGLTFModel("/gltf/box.glb", 4)
-    const { scene: heroModel } = await loadGLTFModel("/gltf/car2.glb")
+    const { scene: treeModel } = await loadGLTFModel(BASE + "gltf/tree.glb")
+    const { scene: stoneModel } = await loadGLTFModel(BASE + "gltf/stone.glb", 400)
+    const { scene: boxModel } = await loadGLTFModel(BASE + "gltf/box.glb", 4)
+    const { scene: heroModel } = await loadGLTFModel(BASE + "gltf/car2.glb")
 
 
     // 先生成空对象地图

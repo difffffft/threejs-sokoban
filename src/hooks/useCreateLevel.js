@@ -7,7 +7,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 import { createMap, isWin } from './map'
 import { MyObjType, MyEmptyObj } from './mObj'
-import { DIRECTOIN, MODEL_SIZE } from '@/constans'
+import { BASE, DIRECTOIN, MODEL_SIZE } from '@/constans'
 import { useLevelStore } from '@/stores/level'
 
 // https://www.12357.net/
@@ -47,7 +47,7 @@ const useCreateLevel = async ({ canvas, onKeyPress, onResize, onWin }) => {
 
     // 平面
     const planeLoader = new THREE.TextureLoader();
-    const planeTexture = planeLoader.load('/texture/images/grass.png');
+    const planeTexture = planeLoader.load(BASE + 'texture/images/grass.png');
     planeTexture.wrapS = THREE.RepeatWrapping
     planeTexture.wrapT = THREE.RepeatWrapping
     planeTexture.repeat.set(4, 4)
@@ -62,7 +62,7 @@ const useCreateLevel = async ({ canvas, onKeyPress, onResize, onWin }) => {
     // 显示当前关卡数
     // https://cdn.jsdelivr.net/gh/mrdoob/three.js@r129/examples/fonts/helvetiker_regular.typeface.json
     const loader = new FontLoader();
-    loader.load('fonts/helvetiker_regular.typeface.json', function (font) {
+    loader.load(BASE + 'fonts/helvetiker_regular.typeface.json', function (font) {
         const textGeometry = new TextGeometry(String(levelStore.level + 1), {
             font: font,
             size: 10,
