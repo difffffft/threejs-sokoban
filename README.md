@@ -1,6 +1,8 @@
 # threejs-sokoban
 
-This template should help get you started developing with Vue 3 in Vite.
+3D版本推箱子，关卡数据不全，可以自行添加关卡（level/modules）
+
+如果你觉得不好看，请自行替换材质（pbulic/gltf）
 
 ## Recommended IDE Setup
 
