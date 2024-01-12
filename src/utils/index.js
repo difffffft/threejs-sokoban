@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 
-import { MAP_SIZE, MODEL_SIZE } from '@/constans'
+import { MODEL_SIZE } from '@/constans'
 
 
 // 加载GLTF

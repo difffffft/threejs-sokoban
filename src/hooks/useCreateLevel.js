@@ -1,27 +1,25 @@
-<script setup>
-import { nanoid } from "nanoid";
-import { onMounted, onBeforeUnmount, ref } from "vue";
+import { ref } from "vue";
 import * as THREE from "three"
 import { OrbitControls } from 'three/examples/jsm/Addons.js'
 
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
 import { createMap, isWin } from './map'
-import { MyObjType } from './mObj'
+import { MyObjType, MyEmptyObj } from './mObj'
 import { DIRECTOIN, MODEL_SIZE } from '@/constans'
-import { MyBoxObj, MyEmptyObj, MyHeroObj, MyStoneObj, MyTreeObj } from './mObj'
+import { useLevelStore } from '@/stores/level'
 
+// https://www.12357.net/
+const useCreateLevel = async ({ canvas, onKeyPress, onResize, onWin }) => {
+    const width = ref(window.innerWidth)
+    const height = ref(window.innerHeight)
+    const levelStore = useLevelStore()
 
-const id = ref(nanoid())
-const canvas = ref(null)
-const width = ref(window.innerWidth)
-const height = ref(window.innerHeight)
-let onKeyPress = null
-let onResize = null
-
-onMounted(async () => {
     const boxSize = 160
     const gridSize = 10
     const gridNum = boxSize / gridSize
-    const { map, hero } = await createMap(gridNum)
+    const { map, hero } = await createMap(levelStore.level, gridNum)
 
     // 场景
     const scene = new THREE.Scene();
@@ -32,7 +30,7 @@ onMounted(async () => {
         10,
         10000
     );
-    camera.position.set(0, 200, 200);
+    camera.position.set(0, 160, 200);
     camera.lookAt(scene.position);
     scene.add(camera);
     // 渲染器
@@ -61,6 +59,24 @@ onMounted(async () => {
     plane.position.y = -1 * gridSize
     scene.add(plane)
 
+    // 显示当前关卡数
+    // https://cdn.jsdelivr.net/gh/mrdoob/three.js@r129/examples/fonts/helvetiker_regular.typeface.json
+    const loader = new FontLoader();
+    loader.load('fonts/helvetiker_regular.typeface.json', function (font) {
+        const textGeometry = new TextGeometry(String(levelStore.level + 1), {
+            font: font,
+            size: 10,
+            height: 5,
+            curveSegments: 12,
+        });
+        const textMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+        textMesh.position.x = -80
+        textMesh.position.z = -80
+        textMesh.rotation.x = -Math.PI / 5
+        scene.add(textMesh);
+    });
+
     // 添加地图
     map.forEach(row => {
         row.forEach(col => {
@@ -77,10 +93,10 @@ onMounted(async () => {
     onResize = () => {
         width.value = window.innerWidth
         height.value = window.innerHeight
-        renderer.setSize(width.value, height.value)
         camera.aspect = width.value / height.value
-        //更新相机投影矩阵
         camera.updateProjectionMatrix()
+
+        renderer.setSize(width.value, height.value)
     }
 
     const handleDirection = (targetRotation, callback) => {
@@ -124,7 +140,7 @@ onMounted(async () => {
             }
         } else if (nextModel.type === MyObjType.TREE) {
             // 推不了
-        } else if (nextModel.type === MyObjType.EMPTY) {
+        } else if (nextModel.type === MyObjType.EMPTY || nextModel.type === MyObjType.STONE) {
             // 移动英雄
             flag === 'left' ? hero.model.position.x -= MODEL_SIZE : hero.model.position.x += MODEL_SIZE
             // 英雄原来的位置，更新为空
@@ -166,7 +182,7 @@ onMounted(async () => {
             }
         } else if (nextModel.type === MyObjType.TREE) {
             // 推不了
-        } else if (nextModel.type === MyObjType.EMPTY) {
+        } else if (nextModel.type === MyObjType.EMPTY || nextModel.type === MyObjType.STONE) {
             // 移动英雄
             flag === 'top' ? hero.model.position.z -= MODEL_SIZE : hero.model.position.z += MODEL_SIZE
             // 英雄原来的位置，更新为空
@@ -192,8 +208,13 @@ onMounted(async () => {
                 handleMoveY(d)
                 break;
         }
-        if (isWin(map)) {
-            console.log('赢了');
+        if (isWin(levelStore.level, map)) {
+            // 不能让用户在点击了
+            document.removeEventListener("keydown", onKeyPress)
+            window.removeEventListener("resize", onResize)
+
+            // 弹窗，让用户选择上一关，重玩，还是下一关。
+            onWin()
         }
     }
 
@@ -248,22 +269,6 @@ onMounted(async () => {
     }
 
     animate();
-})
-
-onBeforeUnmount(() => {
-    document.removeEventListener("keydown", onKeyPress)
-    window.removeEventListener("resize", onResize)
-})
-</script>
-
-<template>
-    <canvas :id="id" ref="canvas"></canvas>
-</template>
-
-<style scoped>
-canvas {
-    width: 100%;
-    height: 100%;
-    color: #13a10e;
 }
-</style>
+
+export default useCreateLevel

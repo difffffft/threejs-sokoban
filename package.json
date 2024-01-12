@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "element-plus": "^2.5.1",
     "nanoid": "^5.0.4",
     "pinia": "^2.1.7",
     "three": "^0.160.0",
